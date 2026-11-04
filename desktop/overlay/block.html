@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TubbyBuddy: hold up</title>
+<style>
+  :root{
+    --font:"Lucida Grande","Lucida Sans Unicode","Lucida Sans","Fira Sans",Geneva,Verdana,sans-serif;
+    --text:#1d2128; --muted:#5d6673; --accent:#2f7de0; --good:#23864f; --bad:#d23a30;
+    --pinstripe:repeating-linear-gradient(180deg,#f4f6f9 0 2px,#e9ecf0 2px 4px);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{font-family:var(--font);color:var(--text);overflow:hidden;background:#ace0fb;display:flex;align-items:center;justify-content:center;
+    -webkit-user-select:none;user-select:none;-webkit-font-smoothing:antialiased}
+  .valley{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+  .valley .paper{filter:drop-shadow(-3px 5px 4px rgba(20,70,120,.22)) drop-shadow(-12px 18px 24px rgba(20,70,120,.16))}
+  .menubar{position:fixed;left:0;right:0;top:0;z-index:2;height:28px;display:flex;align-items:center;gap:12px;padding:0 14px;font-size:13px;
+    background:repeating-linear-gradient(180deg,rgba(255,255,255,.96) 0 1px,rgba(236,239,243,.94) 1px 2px);box-shadow:0 1px 0 rgba(0,0,0,.25),0 2px 10px rgba(0,20,60,.2)}
+  .menubar .brand{display:flex;align-items:center;gap:7px;font-weight:700}
+  .menubar img{width:17px;height:17px;border-radius:5px}
+  .menubar .spacer{flex:1}
+  .win{position:relative;z-index:1;width:min(640px,90vw);border-radius:9px 9px 7px 7px;overflow:hidden;background:var(--pinstripe);
+    border:1px solid rgba(0,0,0,.3);box-shadow:0 30px 80px rgba(6,34,72,.42),0 8px 20px rgba(6,34,72,.22),inset 0 1px 0 rgba(255,255,255,.8);
+    animation:pop .18s ease-out}
+  @keyframes pop{from{transform:scale(.97);opacity:0}to{transform:scale(1);opacity:1}}
+  .titlebar{position:relative;height:26px;display:flex;align-items:center;justify-content:center;
+    background:repeating-linear-gradient(180deg,rgba(255,255,255,.45) 0 1px,transparent 1px 2px),linear-gradient(180deg,#ececec,#d3d3d3);border-bottom:1px solid #9ea3aa}
+  .title{font-size:13px;font-weight:600;color:#2a2d33;text-shadow:0 1px 0 rgba(255,255,255,.85)}
+  .lights{position:absolute;left:9px;top:50%;transform:translateY(-50%);display:flex;gap:7px}
+  .light{position:relative;display:block;width:13px;height:13px;padding:0;border-radius:50%;border:1px solid rgba(0,0,0,.38);
+    box-shadow:inset 0 1px 2px rgba(255,255,255,.5),0 1px 1px rgba(0,0,0,.18)}
+  .light::after{content:"";position:absolute;left:2px;right:2px;top:1px;height:45%;border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,.1))}
+  .light.close{background:radial-gradient(circle at 50% 75%,#ffb3a8,#f0503f 55%,#b8261a);cursor:pointer}
+  .light.close:hover::before{content:"\00d7";position:absolute;inset:0;display:grid;place-items:center;font:700 11px/1 var(--font);color:rgba(80,0,0,.75);z-index:1}
+  .light.min{background:radial-gradient(circle at 50% 75%,#ffe7a6,#f4b62a 55%,#b77c00)}
+  .light.max{background:radial-gradient(circle at 50% 75%,#c9f5ad,#4fbf37 55%,#23801a)}
+  .body{padding:20px 34px 22px;text-align:center}
+  .app-pill{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;background:#fff;border:1px solid #c1c6cd;
+    color:#4b5562;font-size:12px;font-weight:600}
+  .app-pill .dot{width:8px;height:8px;border-radius:50%;background:var(--bad);box-shadow:0 0 0 3px rgba(210,58,48,.15)}
+  .cat{width:230px;height:230px;object-fit:contain;display:block;margin:6px auto 0;filter:drop-shadow(0 14px 18px rgba(30,80,110,.18))}
+  h1{margin:2px 0 8px;font-size:34px;line-height:1.1;font-weight:700;color:#15191f}
+  .line{font-size:18px;line-height:1.45;color:#2a3440;max-width:520px;margin:0 auto 16px;font-weight:600}
+  .stats{display:flex;justify-content:center;margin:0 auto 18px;max-width:420px;border:1px solid #c1c6cd;border-radius:8px;overflow:hidden;background:rgba(255,255,255,.75)}
+  .stat{flex:1;padding:8px 6px}
+  .stat+.stat{border-left:1px solid #d3d7dc}
+  .stat b{display:block;font-size:20px;line-height:1.15}
+  .stat span{font-size:12px;color:var(--muted)}
+  .risk b{color:var(--bad)}
+  .actions{display:flex;flex-direction:column;align-items:center;gap:10px}
+  .gel{position:relative;overflow:hidden;width:min(360px,100%);border-radius:999px;padding:12px 18px;font:600 17px/1.2 var(--font);cursor:pointer;
+    transition:filter .15s ease}
+  .gel::before{content:"";position:absolute;left:4%;right:4%;top:1px;height:44%;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.68),rgba(255,255,255,.03));pointer-events:none}
+  .gel.primary{color:#fff;border:1px solid #1c5fb8;text-shadow:0 -1px 1px rgba(10,40,90,.45);
+    background:linear-gradient(180deg,#b9dcff 0%,#6cb0f7 42%,#2f7de0 50%,#4d9cf2 78%,#9fd7ff 100%);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.75),inset 0 -3px 7px rgba(255,255,255,.6),0 2px 6px rgba(20,60,130,.35);animation:throb 1.6s ease-in-out infinite}
+  @keyframes throb{50%{filter:brightness(1.12) saturate(1.1)}}
+  .gel.secondary{color:#a3241b;border:1px solid #aeb3bc;text-shadow:0 1px 0 rgba(255,255,255,.8);
+    background:linear-gradient(180deg,#fdfdfe 0%,#e4e7ec 48%,#d3d7de 52%,#eceef2 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.9),0 1px 3px rgba(20,60,130,.2)}
+  .gel.destructive{color:#fff;border:1px solid #a81f1f;text-shadow:0 -1px 1px rgba(90,10,10,.45);
+    background:linear-gradient(180deg,#ffc4c4 0%,#f7826c 42%,#e03a2f 50%,#f2604d 78%,#ffb09f 100%);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.75),inset 0 -3px 7px rgba(255,255,255,.5),0 1px 3px rgba(130,20,20,.35)}
+  .gel:hover{filter:brightness(1.05)}
+  .gel:active{transform:translateY(1px)}
+  .gel:focus-visible,.pause:focus-visible,.light:focus-visible{outline:3px solid rgba(108,176,247,.8);outline-offset:2px}
+  .minor{display:flex;justify-content:center;flex-wrap:wrap;gap:2px 16px;margin-top:10px}
+  .pause{background:none;border:0;color:var(--muted);font:12px var(--font);text-decoration:underline;cursor:pointer;padding:4px}
+  .fine{font-size:12px;color:var(--muted);margin:12px 0 0}
+  .emergency{position:fixed;left:0;right:0;bottom:14px;z-index:1;text-align:center;color:#fff;font-size:11px;text-shadow:0 1px 2px rgba(0,30,70,.6)}
+  .result{display:none;margin-top:14px;padding:12px;border-radius:8px;background:#fff;border:1px solid #c1c6cd;font-weight:600}
+  .result.bad{display:block;color:var(--bad)}
+  .result.good{display:block;color:var(--good)}
+  .hidden{display:none!important}
+  @media (prefers-reduced-motion:reduce){.gel.primary{animation:none}}
+  @media (max-height:820px){
+    .cat{width:160px;height:160px;margin-top:2px}
+    h1{font-size:28px}
+    .line{font-size:16px;margin-bottom:12px}
+    .stats{margin-bottom:12px}
+    .gel{padding:10px 14px;font-size:15px}
+    .fine{display:none}
+    .body{padding:14px 26px 16px}
+  }
+</style>
+</head>
+<body>
+  <svg class="valley" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6db3f0"/><stop offset=".45" stop-color="#ace0fb"/><stop offset=".75" stop-color="#dcf1fd"/><stop offset="1" stop-color="#f2faff"/></linearGradient><linearGradient id="g0" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2f2fd"/><stop offset="1" stop-color="#cde7fa"/></linearGradient><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c3e3f9"/><stop offset="1" stop-color="#a9d6f5"/></linearGradient><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fd2f2"/><stop offset="1" stop-color="#86c4ec"/></linearGradient><linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#73b6e6"/><stop offset="1" stop-color="#5ea8df"/></linearGradient><linearGradient id="g4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f9bd6"/><stop offset="1" stop-color="#3f89c7"/></linearGradient><filter id="pp" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="5" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.38 0 0 0 -0.18" result="speck"/><feComposite in="speck" in2="SourceAlpha" operator="in" result="tex"/><feOffset in="SourceAlpha" dy="2" result="off"/><feComposite in="SourceAlpha" in2="off" operator="out" result="rim"/><feFlood flood-color="#fff" flood-opacity=".5"/><feComposite in2="rim" operator="in" result="rimc"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="tex"/><feMergeNode in="rimc"/></feMerge></filter></defs><rect width="1600" height="1000" fill="url(#sky)"/><g transform="translate(1250 230)"><circle r="112" fill="#fff8e4" opacity=".14"/><circle r="92" fill="#fff8e4" opacity=".2"/><circle r="72" fill="#fff8e4" opacity=".3"/><circle r="52" fill="#fff6dc"/></g><g class="paper"><g filter="url(#pp)"><path d="M-40 1040 L-40 467 L-20 450 L0 436 L20 425 L40 413 L60 426 L80 441 L100 454 L120 470 L140 490 L160 510 L180 529 L200 542 L220 519 L240 492 L260 466 L280 443 L300 420 L320 398 L340 372 L360 373 L380 392 L400 412 L420 436 L440 463 L460 491 L480 516 L500 537 L520 555 L540 571 L560 575 L580 556 L600 535 L620 509 L640 477 L660 441 L680 403 L700 367 L720 384 L740 418 L760 450 L780 479 L800 504 L820 527 L840 552 L860 577 L880 600 L900 608 L920 611 L940 610 L960 606 L980 592 L1000 577 L1020 562 L1040 546 L1060 525 L1080 500 L1100 471 L1120 444 L1140 419 L1160 432 L1180 459 L1200 484 L1220 506 L1240 524 L1260 542 L1280 562 L1300 583 L1320 603 L1340 587 L1360 563 L1380 532 L1400 497 L1420 463 L1440 431 L1460 399 L1480 365 L1500 328 L1520 346 L1540 375 L1560 406 L1580 441 L1600 477 L1620 513 L1640 544 L1640 1040Z" fill="url(#g0)"/></g></g><g class="paper"><g filter="url(#pp)"><path d="M-40 1040 L-40 550 L-20 528 L0 511 L20 495 L40 480 L60 463 L80 442 L100 456 L120 476 L140 499 L160 524 L180 548 L200 569 L220 573 L240 557 L260 541 L280 528 L300 517 L320 506 L340 493 L360 487 L380 494 L400 501 L420 512 L440 527 L460 545 L480 561 L500 574 L520 584 L540 572 L560 557 L580 544 L600 532 L620 531 L640 547 L660 557 L680 566 L700 576 L720 589 L740 604 L760 613 L780 598 L800 580 L820 561 L840 543 L860 528 L880 516 L900 505 L920 515 L940 534 L960 549 L980 563 L1000 579 L1020 597 L1040 615 L1060 601 L1080 581 L1100 558 L1120 535 L1140 515 L1160 499 L1180 486 L1200 508 L1220 527 L1240 543 L1260 559 L1280 576 L1300 596 L1320 617 L1340 636 L1360 650 L1380 658 L1400 655 L1420 637 L1440 620 L1460 604 L1480 588 L1500 568 L1520 545 L1540 519 L1560 495 L1580 512 L1600 537 L1620 562 L1640 586 L1640 1040Z" fill="url(#g1)"/></g></g><g class="paper"><g filter="url(#pp)"><path d="M722 673L735 698L730 697L743 724L701 724L714 697L709 698Z" fill="#7dbde8"/><path d="M1496 648L1508 671L1503 670L1516 696L1476 696L1488 670L1483 671Z" fill="#7dbde8"/><path d="M813 669L826 694L821 693L835 721L791 721L805 693L799 694Z" fill="#7dbde8"/><path d="M283 729L296 753L290 752L304 779L262 779L275 752L270 753Z" fill="#7dbde8"/><path d="M1013 688L1028 716L1022 715L1037 746L989 746L1004 715L998 716Z" fill="#7dbde8"/><path d="M134 725L146 746L141 745L152 768L116 768L128 745L123 746Z" fill="#7dbde8"/><path d="M129 710L144 738L138 736L153 768L104 768L120 736L114 738Z" fill="#7dbde8"/><path d="M1117 717L1126 734L1123 733L1132 752L1102 752L1112 733L1108 734Z" fill="#7dbde8"/><path d="M1591 630L1607 660L1600 659L1617 693L1564 693L1581 659L1574 660Z" fill="#7dbde8"/><path d="M1052 697L1066 723L1060 722L1074 750L1030 750L1044 722L1039 723Z" fill="#7dbde8"/><path d="M238 741L247 757L243 757L253 775L224 775L233 757L229 757Z" fill="#7dbde8"/><path d="M847 687L856 704L852 703L862 723L832 723L841 703L837 704Z" fill="#7dbde8"/><path d="M292 738L303 758L298 757L309 779L275 779L286 757L281 758Z" fill="#7dbde8"/><path d="M29 718L42 741L37 740L49 766L9 766L22 740L17 741Z" fill="#7dbde8"/><path d="M-40 1040 L-40 756 L-20 756 L0 756 L20 756 L40 756 L60 756 L80 756 L100 757 L120 757 L140 758 L160 760 L180 761 L200 762 L220 764 L240 766 L260 767 L280 769 L300 770 L320 771 L340 771 L360 772 L380 771 L400 771 L420 769 L440 767 L460 765 L480 762 L500 759 L520 755 L540 750 L560 746 L580 741 L600 737 L620 732 L640 728 L660 724 L680 720 L700 717 L720 714 L740 712 L760 711 L780 710 L800 710 L820 711 L840 712 L860 714 L880 716 L900 719 L920 722 L940 725 L960 728 L980 731 L1000 734 L1020 737 L1040 739 L1060 740 L1080 742 L1100 742 L1120 742 L1140 741 L1160 740 L1180 738 L1200 735 L1220 732 L1240 729 L1260 725 L1280 721 L1300 717 L1320 713 L1340 709 L1360 705 L1380 701 L1400 697 L1420 694 L1440 691 L1460 689 L1480 687 L1500 686 L1520 685 L1540 684 L1560 683 L1580 683 L1600 683 L1620 683 L1640 683 L1640 1040Z" fill="url(#g2)"/></g></g><g class="paper"><g filter="url(#pp)"><path d="M1497 680L1523 728L1512 726L1539 781L1454 781L1481 726L1470 728Z" fill="#539ed8"/><path d="M1444 732L1458 759L1452 757L1466 787L1421 787L1435 757L1429 759Z" fill="#539ed8"/><path d="M951 769L970 804L962 803L982 842L920 842L940 803L932 804Z" fill="#539ed8"/><path d="M849 773L864 801L858 800L873 831L825 831L841 800L834 801Z" fill="#539ed8"/><path d="M295 769L314 805L306 803L326 843L264 843L284 803L276 805Z" fill="#539ed8"/><path d="M343 773L362 809L354 807L374 848L311 848L331 807L323 809Z" fill="#539ed8"/><path d="M21 713L35 740L29 739L44 768L-2 768L12 739L6 740Z" fill="#539ed8"/><path d="M1144 767L1163 802L1155 801L1175 840L1114 840L1133 801L1125 802Z" fill="#539ed8"/><path d="M821 737L844 781L834 779L858 827L783 827L807 779L797 781Z" fill="#539ed8"/><path d="M569 775L583 801L577 800L591 828L546 828L561 800L555 801Z" fill="#539ed8"/><path d="M1264 738L1286 777L1277 775L1299 820L1230 820L1252 775L1243 777Z" fill="#539ed8"/><path d="M1059 763L1081 803L1072 802L1094 847L1024 847L1046 802L1037 803Z" fill="#539ed8"/><path d="M1572 706L1590 739L1583 738L1601 776L1543 776L1561 738L1554 739Z" fill="#539ed8"/><path d="M1226 757L1244 791L1237 789L1255 827L1197 827L1215 789L1208 791Z" fill="#539ed8"/><path d="M918 753L940 794L931 793L954 839L882 839L905 793L896 794Z" fill="#539ed8"/><path d="M496 784L510 810L504 809L519 838L473 838L487 809L481 810Z" fill="#539ed8"/><path d="M-40 1040 L-40 746 L-20 749 L0 753 L20 758 L40 763 L60 769 L80 775 L100 781 L120 788 L140 794 L160 801 L180 807 L200 813 L220 818 L240 823 L260 827 L280 831 L300 834 L320 836 L340 837 L360 838 L380 838 L400 838 L420 836 L440 835 L460 833 L480 830 L500 828 L520 825 L540 822 L560 820 L580 817 L600 815 L620 813 L640 811 L660 810 L680 810 L700 809 L720 810 L740 810 L760 811 L780 813 L800 815 L820 817 L840 819 L860 822 L880 824 L900 827 L920 829 L940 831 L960 833 L980 835 L1000 836 L1020 837 L1040 837 L1060 837 L1080 836 L1100 835 L1120 833 L1140 831 L1160 828 L1180 825 L1200 822 L1220 818 L1240 814 L1260 810 L1280 806 L1300 802 L1320 798 L1340 794 L1360 790 L1380 787 L1400 783 L1420 780 L1440 777 L1460 775 L1480 772 L1500 770 L1520 769 L1540 767 L1560 766 L1580 765 L1600 765 L1620 764 L1640 764 L1640 1040Z" fill="url(#g3)"/></g></g><g class="paper"><g filter="url(#pp)"><path d="M1098 853L1124 900L1113 898L1139 951L1058 951L1084 898L1073 900Z" fill="#3a82c0"/><path d="M993 787L1034 863L1017 859L1059 944L927 944L969 859L952 863Z" fill="#3a82c0"/><path d="M1349 825L1383 888L1369 885L1404 956L1294 956L1329 885L1314 888Z" fill="#3a82c0"/><path d="M1015 826L1046 883L1033 881L1065 945L965 945L997 881L984 883Z" fill="#3a82c0"/><path d="M846 843L872 891L861 889L887 942L805 942L831 889L820 891Z" fill="#3a82c0"/><path d="M1100 813L1136 879L1121 876L1158 951L1042 951L1079 876L1064 879Z" fill="#3a82c0"/><path d="M442 766L474 823L461 821L493 886L392 886L424 821L411 823Z" fill="#3a82c0"/><path d="M1187 832L1220 892L1206 889L1240 957L1135 957L1168 889L1155 892Z" fill="#3a82c0"/><path d="M1554 751L1597 832L1579 828L1624 919L1483 919L1528 828L1510 832Z" fill="#3a82c0"/><path d="M1355 858L1380 905L1370 903L1396 955L1314 955L1340 903L1330 905Z" fill="#3a82c0"/><path d="M-40 1040 L-40 888 L-20 887 L0 885 L20 884 L40 882 L60 880 L80 878 L100 875 L120 873 L140 871 L160 868 L180 866 L200 864 L220 863 L240 861 L260 861 L280 860 L300 860 L320 861 L340 862 L360 864 L380 866 L400 869 L420 872 L440 875 L460 879 L480 883 L500 888 L520 892 L540 896 L560 901 L580 905 L600 909 L620 912 L640 916 L660 919 L680 922 L700 924 L720 926 L740 928 L760 929 L780 930 L800 931 L820 931 L840 932 L860 932 L880 932 L900 932 L920 933 L940 933 L960 933 L980 934 L1000 935 L1020 936 L1040 937 L1060 938 L1080 939 L1100 941 L1120 942 L1140 944 L1160 945 L1180 947 L1200 948 L1220 949 L1240 950 L1260 950 L1280 950 L1300 949 L1320 948 L1340 947 L1360 945 L1380 942 L1400 940 L1420 936 L1440 933 L1460 929 L1480 925 L1500 921 L1520 916 L1540 912 L1560 908 L1580 903 L1600 900 L1620 896 L1640 893 L1640 1040Z" fill="url(#g4)"/></g></g></svg>
+  <div class="menubar"><span class="brand"><img src="../assets/icon.png" alt="" /> TubbyBuddy</span><span class="spacer"></span><span>Desktop guard is on</span></div>
+
+  <main class="win card" role="dialog" aria-labelledby="ask-title">
+    <div class="titlebar">
+      <span class="lights">
+        <button class="light close" id="closeX" title="Pause the guard for 10 minutes" aria-label="Pause the guard for 10 minutes"></button>
+        <i class="light min" aria-hidden="true"></i><i class="light max" aria-hidden="true"></i>
+      </span>
+      <span class="title">TubbyBuddy</span>
+    </div>
+    <div class="body">
+      <div class="app-pill"><span class="dot"></span><span>Opening <span id="appName">a distracting app</span></span></div>
+      <img id="cat" class="cat" alt="Tubby" />
+      <div id="ask">
+        <h1 id="ask-title">Hold up.</h1>
+        <p class="line" id="line">This is where the next hour goes. Put it down for a minute?</p>
+        <div class="stats">
+          <div class="stat"><b id="points">0</b><span>points</span></div>
+          <div class="stat risk"><b id="risk">0</b><span>at risk</span></div>
+          <div class="stat"><b id="streak">0d</b><span>streak</span></div>
+        </div>
+        <div class="actions">
+          <button class="gel primary" id="putDown">Put it down</button>
+          <button class="gel destructive" id="continue">Continue anyway <span id="riskInline"></span></button>
+        </div>
+        <div class="minor">
+          <button class="pause" id="pause">Pause guard for 10 minutes (Esc)</button>
+          <button class="pause" id="quit">Quit app</button>
+          <button class="pause" id="demoOff">Demo: turn guard off for 30 minutes</button>
+        </div>
+        <p class="fine">Putting it down keeps your points and streak. Continuing burns points and resets the streak.</p>
+      </div>
+      <div id="done" class="hidden">
+        <h1 id="doneTitle">Good call.</h1>
+        <p class="line" id="doneLine"></p>
+        <div class="result" id="result"></div>
+      </div>
+    </div>
+  </main>
+  <div class="emergency">Esc pauses 10 min · Ctrl+Alt+Shift+P pauses · Ctrl+Alt+Shift+Q quits TubbyBuddy</div>
+
+<script>
+  const q = new URLSearchParams(location.search);
+  const appLabel = q.get("app") || "a distracting app";
+  const points = Number(q.get("points") || 0);
+  const risk = Number(q.get("risk") || 0);
+  const streak = Number(q.get("streak") || 0);
+  const cat = q.get("cat") || "";
+  const lines = [
+    `${appLabel} is where the next hour goes. Put it down for a minute?`,
+    `You opened ${appLabel}. The feed did not open you.`,
+    `${appLabel} can wait. Your streak is ${streak} day${streak === 1 ? "" : "s"} old.`,
+    `One minute of ${appLabel} is never one minute. Close it?`,
+  ];
+  const line = lines[Math.abs([...appLabel].reduce((a, c) => a + c.charCodeAt(0), 0)) % lines.length];
+  document.getElementById("appName").textContent = appLabel;
+  document.getElementById("line").textContent = line;
+  document.getElementById("points").textContent = points;
+  document.getElementById("risk").textContent = risk;
+  document.getElementById("streak").textContent = streak + "d";
+  document.getElementById("riskInline").textContent = risk > 0 ? `(burn ${risk})` : "";
+  if (cat) document.getElementById("cat").src = cat;
+
+  const api = window.tubbyDesktop;
+  // Swap in a Muse Spark line when the backend answers; the guard never waits for it.
+  if (api && api.nudge) {
+    api.nudge().then((text) => {
+      if (text && !document.getElementById("ask").classList.contains("hidden")) document.getElementById("line").textContent = text;
+    }).catch(() => {});
+  }
+  const ask = document.getElementById("ask");
+  const done = document.getElementById("done");
+  const result = document.getElementById("result");
+
+  document.getElementById("putDown").addEventListener("click", async () => {
+    ask.classList.add("hidden");
+    done.classList.remove("hidden");
+    document.getElementById("doneTitle").textContent = "Good call.";
+    result.className = "result good";
+    result.textContent = "Counting it…";
+    setTimeout(() => api.closeOverlay().catch(() => {}), 250);
+    try {
+      const r = await api.putDown();
+      result.textContent = r.earned > 0 ? `+${r.earned} points. ${r.reason}` : r.reason;
+    } catch (e) {
+      result.textContent = e.message || "Saved locally.";
+    }
+  });
+
+  document.getElementById("continue").addEventListener("click", async () => {
+    ask.classList.add("hidden");
+    done.classList.remove("hidden");
+    document.getElementById("doneTitle").textContent = "Logged.";
+    result.className = "result bad";
+    result.textContent = "Back to it. The guard will leave you alone for 10 minutes.";
+    // Close immediately; the backend call is fire-and-forget from the user's point of view.
+    setTimeout(() => api.closeOverlay().catch(() => {}), 80);
+    try {
+      const r = await api.continueAnyway();
+      result.textContent = r.burned > 0 ? `-${r.burned} points. Back to ${appLabel} for 10 minutes.` : `No points to burn. ${appLabel} unlocked for 10 minutes.`;
+    } catch (e) {
+      result.textContent = e.message || "Could not reach the backend.";
+    }
+  });
+
+  function pauseAndClose() {
+    try { api.pauseGuard(); } catch { api.closeOverlay(); }
+  }
+  document.getElementById("closeX").addEventListener("click", pauseAndClose);
+  document.getElementById("pause").addEventListener("click", pauseAndClose);
+  document.getElementById("quit").addEventListener("click", () => {
+    try { api.quitApp(); } catch { api.closeOverlay(); }
+  });
+  document.getElementById("demoOff").addEventListener("click", () => {
+    try { api.demoOff(); } catch { api.closeOverlay(); }
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      pauseAndClose();
+    }
+  });
+</script>
+</body>
+</html>

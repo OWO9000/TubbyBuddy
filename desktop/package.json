@@ -1,0 +1,19 @@
+{
+  "name": "tubbybuddy-desktop",
+  "version": "0.6.0",
+  "private": true,
+  "description": "TubbyBuddy desktop focus guard: tray, app blocking, focus sessions and schedules.",
+  "main": "main.js",
+  "author": "TubbyBuddy",
+  "license": "MIT",
+  "scripts": {
+    "start": "npm run sync:web && electron .",
+    "sync:web": "node scripts/sync-web.js",
+    "pack": "npm run sync:web && electron-packager . TubbyBuddy --platform=win32 --arch=x64 --out=release --overwrite --icon=assets/icon.ico --app-version=0.6.0 --extra-resource=../extension --ignore=shots --ignore=release --ignore=node_modules --ignore=desktop.log --ignore=install.ps1 --ignore=Install-TubbyBuddy.ps1 --ignore=README-portable.txt"
+  },
+  "devDependencies": {
+    "@electron/packager": "^18.4.0",
+    "electron": "^33.0.0"
+  }
+}
+

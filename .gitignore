@@ -1,0 +1,30 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.log
+# runtime data
+backend/data/
+backend/media/
+# android (managed separately)
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+*.keystore
+*.jks
+.DS_Store
+.idea/
+.vscode/
+*.tsbuildinfo
+# browser-test output
+shots/
+tools/e2e/shots/
+# desktop build output
+desktop/web/
+desktop/release/
+desktop/shots/
+
+# Electron GPU shader cache on Windows
+desktop/NVIDIA Corporation/

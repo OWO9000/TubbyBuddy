@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TubbyBuddy: Options</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <main class="wrap">
+    <header class="head">
+      <div aria-hidden="true">
+        <img class="brand-icon" src="../../icons/icon128.png" width="52" height="52" alt="" />
+      </div>
+      <div>
+        <h1>TubbyBuddy options</h1>
+        <p class="tagline">Put your distractions down. Earn real life.</p>
+      </div>
+    </header>
+
+    <form id="options-form" novalidate>
+      <section class="card" aria-labelledby="backend-h">
+        <h2 id="backend-h">Backend</h2>
+        <label class="field">
+          <span class="label">Backend URL</span>
+          <input id="backend-url" type="url" inputmode="url" placeholder="https://tubbybuddy-production.up.railway.app" autocomplete="off" spellcheck="false">
+        </label>
+        <p class="hint">Where the TubbyBuddy backend runs. Default <code>https://tubbybuddy-production.up.railway.app</code>. Use <code>http://localhost:8787</code> for a local server.</p>
+        <p class="error" id="backend-url-error" hidden></p>
+        <div class="row">
+          <button id="test-connection" type="button" class="btn btn-ghost">Test connection</button>
+          <span id="test-status" class="test-status" aria-live="polite"></span>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="device-h">
+        <h2 id="device-h">Device id</h2>
+        <label class="field">
+          <span class="label">Device id</span>
+          <input id="device-id" type="text" autocomplete="off" spellcheck="false">
+        </label>
+        <p class="hint">Paste the same id your phone uses to share one TubbyBuddy account. Allowed: letters, digits, <code>. _ : -</code>, 4–128 chars.</p>
+        <p class="error" id="device-id-error" hidden></p>
+        <div class="row">
+          <button id="regen-device" type="button" class="btn btn-ghost">Regenerate</button>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="goals-h">
+        <h2 id="goals-h">Goals <span class="count" id="goals-count">0 / 6</span></h2>
+        <label class="field">
+          <span class="label">One goal per line (up to 6, each 2–200 chars)</span>
+          <textarea id="goals" rows="6" placeholder="Spend less time scrolling"></textarea>
+        </label>
+        <p class="error" id="goals-error" hidden></p>
+      </section>
+
+      <section class="card" aria-labelledby="sites-h">
+        <h2 id="sites-h">Blocked sites</h2>
+        <p class="hint">An entry like <code>example.com</code> blocks that host and all subdomains. An entry with a path like <code>youtube.com/shorts</code> blocks that path prefix.</p>
+        <div class="row">
+          <input id="site-input" type="text" placeholder="example.com or example.com/path" autocomplete="off" spellcheck="false" aria-label="New blocked site">
+          <button id="site-add" type="button" class="btn btn-ghost">Add</button>
+        </div>
+        <p class="error" id="sites-error" hidden></p>
+        <ul id="sites-list" class="sites"></ul>
+        <div class="row">
+          <button id="sites-reset" type="button" class="btn btn-ghost">Reset to defaults</button>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="points-h">
+        <h2 id="points-h">Points at risk</h2>
+        <label class="field">
+          <span class="label">Points burned per slip (1–10000)</span>
+          <input id="points" type="number" min="1" max="10000" step="1" inputmode="numeric">
+        </label>
+        <p class="hint">Sent as-is; the backend caps it at your balance. The overlay shows the smaller of this and your known balance.</p>
+        <p class="error" id="points-error" hidden></p>
+      </section>
+
+      <section class="card" aria-labelledby="tone-h">
+        <h2 id="tone-h">Nudge tone</h2>
+        <label class="field">
+          <span class="label">Preferred coach tone</span>
+          <select id="tone">
+            <option value="playful">Playful</option>
+            <option value="tough-love">Tough love</option>
+            <option value="calm">Calm</option>
+            <option value="hype">Hype</option>
+            <option value="witty">Witty</option>
+          </select>
+        </label>
+        <p class="error" id="tone-error" hidden></p>
+      </section>
+
+      <div class="save-row">
+        <button id="save" type="submit" class="btn btn-primary">Save</button>
+        <span id="save-status" class="save-status" aria-live="polite"></span>
+      </div>
+    </form>
+  </main>
+  <script src="../shared/constants.js"></script>
+  <script src="../shared/match.js"></script>
+  <script src="../shared/storage.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

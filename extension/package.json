@@ -1,0 +1,10 @@
+{
+  "name": "burn-focus-guard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Burn Focus Guard Chrome extension (dependency-free). Node is only used for icon generation and tests.",
+  "scripts": {
+    "test": "node tests/match.test.mjs"
+  }
+}

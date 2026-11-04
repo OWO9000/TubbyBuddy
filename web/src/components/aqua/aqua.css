@@ -1,0 +1,99 @@
+/* Aqua theme tokens + plain-CSS versions of the Aqua button and dock components (no Tailwind in this app).
+   Buttons are prefixed with `button.` so page-level button rules never repaint them. */
+:root {
+  --aqua-accent: #2f7de0;
+  --aqua-gel-hi: color-mix(in oklab, var(--aqua-accent) 38%, white);
+  --aqua-gel-light: color-mix(in oklab, var(--aqua-accent) 62%, white);
+  --aqua-gel-mid: color-mix(in oklab, var(--aqua-accent) 90%, white);
+  --aqua-gel-deep: color-mix(in oklab, var(--aqua-accent) 85%, black);
+  --aqua-edge: color-mix(in oklab, var(--aqua-accent) 72%, black);
+  --aqua-ring: color-mix(in oklab, var(--aqua-accent) 55%, white);
+}
+
+/* ---------- Aqua gel pill button ---------- */
+button.aqua-btn {
+  font: inherit;
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; flex-shrink: 0; overflow: hidden; white-space: nowrap; user-select: none;
+  border-radius: 999px; font-weight: 600; letter-spacing: -0.01em;
+  outline: none; cursor: pointer; transition: filter 0.15s ease;
+  min-width: 0; height: auto; background-image: none; box-sizing: border-box;
+}
+button.aqua-btn::before {
+  content: ""; pointer-events: none; position: absolute;
+  left: 4%; right: 4%; top: 1px; height: 44%; border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.68), rgba(255,255,255,0.03));
+}
+button.aqua-btn:hover { filter: brightness(1.05); }
+button.aqua-btn:focus-visible { box-shadow: 0 0 0 3px color-mix(in srgb, var(--aqua-ring, #6cb0f7) 70%, transparent); }
+button.aqua-btn:active { transform: translateY(1px); filter: brightness(0.95); }
+button.aqua-btn:disabled { pointer-events: none; opacity: 0.5; }
+button.aqua-btn svg { pointer-events: none; flex-shrink: 0; }
+
+button.aqua-btn.aqua-btn-default {
+  border: 1px solid var(--aqua-edge, #1c5fb8); color: #fff;
+  background: linear-gradient(180deg,
+    var(--aqua-gel-hi, #b9dcff) 0%, var(--aqua-gel-light, #6cb0f7) 42%,
+    var(--aqua-accent, #2f7de0) 50%, var(--aqua-gel-light, #4d9cf2) 78%,
+    var(--aqua-gel-hi, #9fd7ff) 100%);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.75), inset 0 -3px 7px rgba(255,255,255,0.6),
+    0 1px 3px rgba(20,60,130,0.35);
+  text-shadow: 0 -1px 1px rgba(10,40,90,0.45);
+}
+button.aqua-btn.aqua-btn-secondary {
+  border: 1px solid #aeb3bc; color: #3a3f47;
+  background: linear-gradient(180deg, #fdfdfe 0%, #e4e7ec 48%, #d3d7de 52%, #eceef2 100%);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.9), 0 1px 2px rgba(20,60,130,0.2);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+}
+button.aqua-btn.aqua-btn-secondary::before { opacity: 0.55; }
+button.aqua-btn.aqua-btn-destructive {
+  border: 1px solid #a81f1f; color: #fff;
+  background: linear-gradient(180deg, #ffc4c4 0%, #f7826c 42%, #e03a2f 50%, #f2604d 78%, #ffb09f 100%);
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.75), inset 0 -3px 7px rgba(255,255,255,0.5),
+    0 1px 3px rgba(130,20,20,0.35);
+  text-shadow: 0 -1px 1px rgba(90,10,10,0.45);
+}
+button.aqua-btn.aqua-btn-sm { padding: 7px 20px; font-size: 14px; }
+button.aqua-btn.aqua-btn-md { padding: 10px 28px; font-size: 16px; }
+button.aqua-btn.aqua-btn-lg { padding: 13px 32px; font-size: 20px; }
+
+/* ---------- Aqua dock ---------- */
+.aqua-dock {
+  display: flex; width: fit-content; align-items: flex-end; gap: 18px;
+  border-radius: 22px; border: 1px solid rgba(255,255,255,0.9);
+  background: linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(235,238,243,0.75) 100%);
+  padding: 14px 26px 10px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 0 0 1px rgba(20,40,80,0.08),
+    0 16px 38px rgba(30,40,60,0.18);
+}
+.aqua-dock-item {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 5px;
+  transition: transform 0.2s ease-out; cursor: pointer;
+}
+.aqua-dock-item:hover { transform: translateY(-10px) scale(1.12); }
+@media (prefers-reduced-motion: reduce) {
+  .aqua-dock-item { transition: none; }
+  .aqua-dock-item:hover { transform: none; }
+}
+.aqua-dock-label {
+  pointer-events: none; position: absolute; top: -30px; white-space: nowrap;
+  font-size: 13px; font-weight: 600; color: #fff; opacity: 0; transition: opacity 0.2s;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.9), 0 0 5px rgba(0,0,0,0.65), 0 0 10px rgba(0,0,0,0.45);
+}
+.aqua-dock-item:hover .aqua-dock-label { opacity: 1; }
+.aqua-dock-dot { width: 4px; height: 4px; border-radius: 999px; background: #5a6270; opacity: 0; }
+.aqua-dock-dot.on { opacity: 1; }
+.aqua-dock-icon {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  width: 58px; height: 58px; overflow: hidden; border-radius: 14px;
+  background: linear-gradient(180deg, #8ec2f9 0%, #4a90ec 55%, #2f7de0 100%);
+  font-size: 26px; font-weight: 700; color: #fff;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.6), 0 3px 8px rgba(20,30,50,0.25);
+  text-shadow: 0 -1px 1px rgba(0,0,0,0.3);
+}
+.aqua-dock-icon::before {
+  content: ""; position: absolute; left: 8%; right: 8%; top: 4%; height: 45%;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.1));
+}

@@ -1,0 +1,17 @@
+{
+  "name": "burn-monorepo",
+  "private": true,
+  "workspaces": ["backend", "web"],
+  "scripts": {
+    "dev": "concurrently -n api,web -c yellow,cyan \"npm run dev -w backend\" \"npm run dev -w web\"",
+    "build": "npm run build -w web && npm run build -w backend",
+    "start": "npm run start -w backend",
+    "desktop": "npm --prefix desktop start",
+    "pack:desktop": "npm --prefix desktop run pack",
+    "test": "npm test -w backend",
+    "test:live": "npm run test:live -w backend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

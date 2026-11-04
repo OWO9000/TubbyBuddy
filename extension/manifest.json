@@ -1,0 +1,51 @@
+{
+  "manifest_version": 3,
+  "name": "TubbyBuddy: Focus Guard",
+  "version": "0.1.0",
+  "description": "TubbyBuddy Focus Guard: Tubby helps you put your distractions down and earn real life. Guards distracting sites and protects your streak and points.",
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "TubbyBuddy: Focus Guard",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_ui": {
+    "page": "src/options/options.html",
+    "open_in_tab": true
+  },
+  "background": {
+    "service_worker": "src/background/service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "src/shared/constants.js",
+        "src/shared/match.js",
+        "src/shared/nudges.js",
+        "src/shared/storage.js",
+        "src/content/content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "permissions": ["storage", "tabs", "alarms", "webNavigation"],
+  "host_permissions": ["<all_urls>"],
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/*.png"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

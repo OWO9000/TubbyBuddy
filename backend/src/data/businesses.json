@@ -1,0 +1,284 @@
+[
+  {
+    "id": "b01",
+    "name": "Granite Loft Bouldering",
+    "city": "San Francisco",
+    "category": "fitness",
+    "neighborhood": "Dogpatch",
+    "description": "Bouldering gym with intro classes and a community board. Quiet weekday mornings.",
+    "priceLevel": 2,
+    "rating": 4.7,
+    "tags": [
+      "climbing",
+      "beginner-friendly",
+      "community"
+    ],
+    "slowHours": "Weekday 6am-11am is slow",
+    "contact": "owner+b01@example.com",
+    "website": "https://example.org/b01",
+    "fictional": true
+  },
+  {
+    "id": "b02",
+    "name": "Little Ember Coffee",
+    "city": "San Francisco",
+    "category": "food",
+    "neighborhood": "Mission",
+    "description": "Neighborhood espresso bar, no-laptop weekends, big communal table.",
+    "priceLevel": 1,
+    "rating": 4.5,
+    "tags": [
+      "coffee",
+      "pastries",
+      "no-laptop"
+    ],
+    "slowHours": "2pm-5pm slump",
+    "contact": "owner+b02@example.com",
+    "website": "https://example.org/b02",
+    "fictional": true
+  },
+  {
+    "id": "b03",
+    "name": "Wheelhouse Clay Studio",
+    "city": "San Francisco",
+    "category": "class",
+    "neighborhood": "Bernal Heights",
+    "description": "Pottery studio running 2-hour intro wheel classes, 8 seats each.",
+    "priceLevel": 3,
+    "rating": 4.9,
+    "tags": [
+      "pottery",
+      "hands-on",
+      "date-night"
+    ],
+    "slowHours": "Tuesday classes under half full",
+    "contact": "owner+b03@example.com",
+    "website": "https://example.org/b03",
+    "fictional": true
+  },
+  {
+    "id": "b04",
+    "name": "Fog City Board Game Cafe",
+    "city": "San Francisco",
+    "category": "experience",
+    "neighborhood": "Inner Richmond",
+    "description": "Board game cafe with 600 games and a game guru on staff.",
+    "priceLevel": 2,
+    "rating": 4.6,
+    "tags": [
+      "games",
+      "groups",
+      "offline"
+    ],
+    "slowHours": "Weeknights before 7pm",
+    "contact": "owner+b04@example.com",
+    "website": "https://example.org/b04",
+    "fictional": true
+  },
+  {
+    "id": "b05",
+    "name": "Sunset Strand Surf School",
+    "city": "San Francisco",
+    "category": "fitness",
+    "neighborhood": "Outer Sunset",
+    "description": "Group surf lessons for beginners with wetsuit rental.",
+    "priceLevel": 3,
+    "rating": 4.4,
+    "tags": [
+      "surf",
+      "outdoors",
+      "lessons"
+    ],
+    "slowHours": "Weekday lessons",
+    "contact": "owner+b05@example.com",
+    "website": "https://example.org/b05",
+    "fictional": true
+  },
+  {
+    "id": "b06",
+    "name": "Night Owl Arcade Bar",
+    "city": "San Francisco",
+    "category": "experience",
+    "neighborhood": "SoMa",
+    "description": "Arcade bar, open late, heavy weekend crowds.",
+    "priceLevel": 2,
+    "rating": 3.9,
+    "tags": [
+      "arcade",
+      "bar",
+      "late-night"
+    ],
+    "slowHours": "Rarely slow",
+    "contact": "owner+b06@example.com",
+    "website": "https://example.org/b06",
+    "fictional": true
+  },
+  {
+    "id": "b07",
+    "name": "Paper & Pine Bookshop",
+    "city": "San Francisco",
+    "category": "retail",
+    "neighborhood": "Noe Valley",
+    "description": "Independent bookstore with a reading nook and monthly book club.",
+    "priceLevel": 2,
+    "rating": 4.8,
+    "tags": [
+      "books",
+      "quiet",
+      "book-club"
+    ],
+    "slowHours": "Weekday afternoons",
+    "contact": "owner+b07@example.com",
+    "website": "https://example.org/b07",
+    "fictional": true
+  },
+  {
+    "id": "b08",
+    "name": "Rise Up Sourdough",
+    "city": "San Francisco",
+    "category": "food",
+    "neighborhood": "Richmond",
+    "description": "Bakery that sells out by noon; no seating.",
+    "priceLevel": 1,
+    "rating": 4.6,
+    "tags": [
+      "bakery",
+      "takeaway"
+    ],
+    "slowHours": "Afternoons (sold out)",
+    "contact": "owner+b08@example.com",
+    "website": "https://example.org/b08",
+    "fictional": true
+  },
+  {
+    "id": "b09",
+    "name": "Vinyasa on Valencia",
+    "city": "San Francisco",
+    "category": "fitness",
+    "neighborhood": "Mission",
+    "description": "Yoga studio with phone-free classes and a tea lounge.",
+    "priceLevel": 2,
+    "rating": 4.5,
+    "tags": [
+      "yoga",
+      "phone-free",
+      "tea"
+    ],
+    "slowHours": "Midday classes",
+    "contact": "owner+b09@example.com",
+    "website": "https://example.org/b09",
+    "fictional": true
+  },
+  {
+    "id": "b10",
+    "name": "Lakeshore Kayak Rentals",
+    "city": "Oakland",
+    "category": "experience",
+    "neighborhood": "Lake Merritt",
+    "description": "Kayak and paddleboard rentals by the hour on the lake.",
+    "priceLevel": 2,
+    "rating": 4.6,
+    "tags": [
+      "kayak",
+      "outdoors",
+      "rentals"
+    ],
+    "slowHours": "Weekday mornings",
+    "contact": "owner+b10@example.com",
+    "website": "https://example.org/b10",
+    "fictional": true
+  },
+  {
+    "id": "b11",
+    "name": "Temescal Ink & Print",
+    "city": "Oakland",
+    "category": "class",
+    "neighborhood": "Temescal",
+    "description": "Screen printing workshops; make your own tote in 90 minutes.",
+    "priceLevel": 2,
+    "rating": 4.7,
+    "tags": [
+      "printmaking",
+      "workshop",
+      "hands-on"
+    ],
+    "slowHours": "Thursday workshops",
+    "contact": "owner+b11@example.com",
+    "website": "https://example.org/b11",
+    "fictional": true
+  },
+  {
+    "id": "b12",
+    "name": "Jack London Jazz Room",
+    "city": "Oakland",
+    "category": "experience",
+    "neighborhood": "Jack London Square",
+    "description": "Live jazz nightly, small cover, supper menu.",
+    "priceLevel": 3,
+    "rating": 4.5,
+    "tags": [
+      "live-music",
+      "jazz",
+      "dinner"
+    ],
+    "slowHours": "Sunday-Wednesday",
+    "contact": "owner+b12@example.com",
+    "website": "https://example.org/b12",
+    "fictional": true
+  },
+  {
+    "id": "b13",
+    "name": "Rockridge Ramen Bar",
+    "city": "Oakland",
+    "category": "food",
+    "neighborhood": "Rockridge",
+    "description": "Counter-seat ramen shop, 14 seats, long lines on weekends.",
+    "priceLevel": 2,
+    "rating": 4.4,
+    "tags": [
+      "ramen",
+      "counter",
+      "quick"
+    ],
+    "slowHours": "3pm-5pm",
+    "contact": "owner+b13@example.com",
+    "website": "https://example.org/b13",
+    "fictional": true
+  },
+  {
+    "id": "b14",
+    "name": "Uptown Climbing Collective",
+    "city": "Oakland",
+    "category": "fitness",
+    "neighborhood": "Uptown",
+    "description": "Co-op climbing gym with ropes and a youth program.",
+    "priceLevel": 2,
+    "rating": 4.3,
+    "tags": [
+      "climbing",
+      "co-op"
+    ],
+    "slowHours": "Weekday early afternoons",
+    "contact": "owner+b14@example.com",
+    "website": "https://example.org/b14",
+    "fictional": true
+  },
+  {
+    "id": "b15",
+    "name": "QuickFix Phone Repair",
+    "city": "Oakland",
+    "category": "retail",
+    "neighborhood": "Downtown",
+    "description": "Phone screen repair and accessories.",
+    "priceLevel": 1,
+    "rating": 4.0,
+    "tags": [
+      "phones",
+      "repair"
+    ],
+    "slowHours": "Mornings",
+    "contact": "owner+b15@example.com",
+    "website": "https://example.org/b15",
+    "fictional": true
+  }
+]

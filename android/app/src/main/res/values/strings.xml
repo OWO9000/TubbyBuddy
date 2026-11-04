@@ -1,0 +1,5 @@
+<resources>
+  <string name="app_name">TubbyBuddy</string>
+  <string name="channel_guard">Focus guard</string>
+  <string name="channel_guard_desc">Shown while TubbyBuddy is watching your limited apps</string>
+</resources>

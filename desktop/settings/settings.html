@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>TubbyBuddy: desktop guard</title>
+<style>
+  /* Same look as the app (web/src/theme.css): Aqua window over the paper valley, group boxes, gel buttons. */
+  :root{--font:"Lucida Grande","Lucida Sans Unicode","Lucida Sans","Fira Sans",Geneva,Verdana,sans-serif;
+    --text:#1d2128;--muted:#5d6673;--accent:#2f7de0;--good:#23864f;--bad:#d23a30}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font:14px/1.45 var(--font);color:var(--text);-webkit-font-smoothing:antialiased;background:#ace0fb;overflow:hidden}
+  .valley{position:fixed;inset:0;width:100%;height:100%}
+  .win{position:fixed;inset:14px;display:flex;flex-direction:column;border-radius:9px 9px 7px 7px;overflow:hidden;
+    background:repeating-linear-gradient(180deg,#f4f6f9 0 2px,#e9ecf0 2px 4px);border:1px solid rgba(0,0,0,.3);
+    box-shadow:0 24px 60px rgba(6,34,72,.36),0 6px 18px rgba(6,34,72,.2),inset 0 1px 0 rgba(255,255,255,.8)}
+  .titlebar{position:relative;flex:none;display:flex;align-items:center;justify-content:center;height:26px;padding:0 70px;
+    background:repeating-linear-gradient(180deg,rgba(255,255,255,.45) 0 1px,transparent 1px 2px),linear-gradient(180deg,#ececec,#d3d3d3);
+    border-bottom:1px solid #9ea3aa;font-size:13px;font-weight:600;color:#2a2d33;text-shadow:0 1px 0 rgba(255,255,255,.85);-webkit-app-region:drag}
+  .lights{position:absolute;left:9px;top:50%;transform:translateY(-50%);display:flex;gap:7px;-webkit-app-region:no-drag}
+  .light{position:relative;display:block;width:13px;height:13px;padding:0;border-radius:50%;border:1px solid rgba(0,0,0,.38);
+    box-shadow:inset 0 1px 2px rgba(255,255,255,.5),0 1px 1px rgba(0,0,0,.18)}
+  .light::after{content:"";position:absolute;left:2px;right:2px;top:1px;height:45%;border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(255,255,255,.1))}
+  .light.close{background:radial-gradient(circle at 50% 75%,#ffb3a8,#f0503f 55%,#b8261a);cursor:pointer}
+  .light.close:hover::before{content:"×";position:absolute;inset:0;display:grid;place-items:center;font:700 11px/1 var(--font);color:rgba(80,0,0,.75);z-index:1}
+  .light.min{background:radial-gradient(circle at 50% 75%,#ffe7a6,#f4b62a 55%,#b77c00)}
+  .light.max{background:radial-gradient(circle at 50% 75%,#c9f5ad,#4fbf37 55%,#23801a)}
+  .body{flex:1;min-height:0;overflow:auto;padding:18px 20px 8px}
+  .head{display:flex;align-items:center;gap:14px;margin:0 0 14px}
+  .head img{width:58px;height:58px;object-fit:contain}
+  h1{margin:0;font-size:22px;font-weight:700}
+  .sub{color:var(--muted);font-size:13px;margin:2px 0 0}
+  .card{background:rgba(255,255,255,.7);border:1px solid #c1c6cd;border-radius:8px;padding:14px 16px;margin:0 0 12px;
+    box-shadow:inset 0 1px 2px rgba(0,0,0,.05),0 1px 0 rgba(255,255,255,.8)}
+  h2{font-size:15px;margin:0 0 6px}
+  .hint{color:var(--muted);font-size:12px;line-height:1.45;margin:0 0 10px}
+  label{font-size:13px;font-weight:600}
+  input[type=text],input[type=url],input[type=time],select{width:100%;padding:8px 12px;border-radius:999px;border:1px solid #a3b0c0;background:#fff;
+    color:var(--text);font:inherit;font-size:13px;margin:5px 0 10px;box-shadow:inset 0 1px 2px rgba(0,0,0,.12)}
+  select{border-radius:6px}
+  input:focus,select:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .apps{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .apps.installed{max-height:270px;overflow:auto;padding:2px;align-content:start}
+  .app-search{display:flex;gap:8px;margin:8px 0 4px;align-items:center}
+  .app-search input{margin:0;flex:1}
+  .app{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:6px;background:#fff;border:1px solid #d3d7dc;font-size:13px;font-weight:600;min-width:0}
+  .app > span,.app > div{min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .app small{display:block;color:var(--muted);font-weight:400;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 0}
+  .row + .row{border-top:1px solid #e3e6ea}
+  .row span{font-size:13px;font-weight:600}
+  /* Aqua checkbox, the same control the app uses for on/off. */
+  input[type=checkbox]{appearance:none;-webkit-appearance:none;flex:none;position:relative;width:18px;height:18px;margin:0;border-radius:4px;border:1px solid #8a9099;
+    background:linear-gradient(180deg,#fff,#e1e4e8);box-shadow:inset 0 1px 1px #fff,0 1px 1px rgba(0,0,0,.14);cursor:pointer}
+  input[type=checkbox]::after{content:"";position:absolute;top:2px;left:5px;width:5px;height:10px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg) scale(0);transition:transform .12s ease}
+  input[type=checkbox]:checked{border-color:#1c5fb8;background:linear-gradient(180deg,#a8d0f7 0%,#4a90ec 50%,#2a6fd0 51%,#6aabf3 100%)}
+  input[type=checkbox]:checked::after{transform:rotate(45deg) scale(1)}
+  input[type=checkbox]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .days{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 10px}
+  .day{padding:6px 12px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;user-select:none;border:1px solid #a7adb5;color:#2b3038;
+    background:linear-gradient(180deg,#fff 0%,#eef0f3 48%,#e2e5ea 52%,#f4f5f7 100%)}
+  .day.on{color:#fff;border-color:#1c5fb8;text-shadow:0 -1px 0 rgba(0,30,80,.35);background:linear-gradient(180deg,#a8d0f7 0%,#4a90ec 50%,#2a6fd0 51%,#6aabf3 100%)}
+  /* Gel buttons (web button.aqua-btn). */
+  button{position:relative;overflow:hidden;flex:none;border-radius:999px;padding:8px 18px;font:600 13px/1.2 var(--font);cursor:pointer;white-space:nowrap;
+    color:#fff;border:1px solid #1c5fb8;text-shadow:0 -1px 1px rgba(10,40,90,.45);
+    background:linear-gradient(180deg,#b9dcff 0%,#6cb0f7 42%,#2f7de0 50%,#4d9cf2 78%,#9fd7ff 100%);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.75),inset 0 -3px 7px rgba(255,255,255,.6),0 1px 3px rgba(20,60,130,.35)}
+  button::before{content:"";pointer-events:none;position:absolute;left:4%;right:4%;top:1px;height:44%;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.68),rgba(255,255,255,.03))}
+  button:hover{filter:brightness(1.05)} button:active{transform:translateY(1px);filter:brightness(.95)}
+  button.secondary,.cancel{color:#3a3f47;border-color:#aeb3bc;text-shadow:0 1px 0 rgba(255,255,255,.8);
+    background:linear-gradient(180deg,#fdfdfe 0%,#e4e7ec 48%,#d3d7de 52%,#eceef2 100%);box-shadow:inset 0 1px 1px rgba(255,255,255,.9),0 1px 2px rgba(20,60,130,.2)}
+  button.secondary::before,.cancel::before{opacity:.55}
+  .note{font-size:12px;color:var(--muted);line-height:1.45;margin:4px 0 0}
+  .ok{color:var(--good);font-weight:600;font-size:12px;min-height:16px;margin:4px 0 0}
+  .actions{flex:none;display:flex;justify-content:flex-end;gap:10px;padding:12px 20px 14px;border-top:1px solid #c9cdd3;background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,0))}
+  .actions button{padding:10px 22px;font-size:14px}
+  code{font-size:12px}
+  button.light{padding:0;filter:none;transform:none;text-shadow:none;border:1px solid rgba(0,0,0,.38);box-shadow:inset 0 1px 2px rgba(255,255,255,.5),0 1px 1px rgba(0,0,0,.18)}
+  button.light::before{content:none}
+  button.light.close:hover::before{content:"×";position:absolute;inset:0;left:0;right:0;top:0;height:auto;display:grid;place-items:center;background:none;
+    font:700 11px/1 var(--font);color:rgba(80,0,0,.75);z-index:1}
+</style>
+</head>
+<body>
+  <svg class="valley" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6db3f0"/><stop offset=".45" stop-color="#ace0fb"/><stop offset=".75" stop-color="#dcf1fd"/><stop offset="1" stop-color="#f2faff"/></linearGradient><linearGradient id="g0" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e2f2fd"/><stop offset="1" stop-color="#cde7fa"/></linearGradient><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c3e3f9"/><stop offset="1" stop-color="#a9d6f5"/></linearGradient><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fd2f2"/><stop offset="1" stop-color="#86c4ec"/></linearGradient><linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#73b6e6"/><stop offset="1" stop-color="#5ea8df"/></linearGradient><linearGradient id="g4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4f9bd6"/><stop offset="1" stop-color="#3f89c7"/></linearGradient><filter id="pp" x="-2%" y="-2%" width="104%" height="104%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="5" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.38 0 0 0 -0.18" result="speck"/><feComposite in="speck" in2="SourceAlpha" operator="in" result="tex"/><feOffset in="SourceAlpha" dy="2" result="off"/><feComposite in="SourceAlpha" in2="off" operator="out" result="rim"/><feFlood flood-color="#fff" flood-opacity=".5"/><feComposite in2="rim" operator="in" result="rimc"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="tex"/><feMergeNode in="rimc"/></feMerge></filter></defs><rect width="1600" height="1000" fill="url(#sky)"/><g transform="translate(1250 230)"><circle r="112" fill="#fff8e4" opacity=".14"/><circle r="92" fill="#fff8e4" opacity=".2"/><circle r="72" fill="#fff8e4" opacity=".3"/><circle r="52" fill="#fff6dc"/></g><g class="paper"><g filter="url(#pp)"><path d="M-40 1040 L-40 467 L-20 450 L0 436 L20 425 L40 413 L60 426 L80 441 L100 454 L120 470 L140 490 L160 510 L180 529 L200 542 L220 519 L240 492 L260 466 L280 443 L300 420 L320 398 L340 372 L360 373 L380 392 L400 412 L420 436 L440 463 L460 491 L480 516 L500 537 L520 555 L540 571 L560 575 L580 556 L600 535 L620 509 L640 477 L660 441 L680 403 L700 367 L720 384 L740 418 L760 450 L780 479 L800 504 L820 527 L840 552 L860 577 L880 600 L900 608 L920 611 L940 610 L960 606 L980 592 L1000 577 L1020 562 L1040 546 L1060 525 L1080 500 L1100 471 L1120 444 L1140 419 L1160 432 L1180 459 L1200 484 L1220 506 L1240 524 L1260 542 L1280 562 L1300 583 L1320 603 L1340 587 L1360 563 L1380 532 L1400 497 L1420 463 L1440 431 L1460 399 L1480 365 L1500 328 L1520 346 L1540 375 L1560 406 L1580 441 L1600 477 L1620 513 L1640 544 L1640 1040Z" fill="url(#g0)"/></g></g><g class="paper"><g filter="url(#pp)"><path d="M-40 1040 L-40 550 L-20 528 L0 511 L20 495 L40 480 L60 463 L80 442 L100 456 L120 476 L140 499 L160 524 L180 548 L200 569 L220 573 L240 557 L260 541 L280 528 L300 517 L320 506 L340 493 L360 487 L380 494 L400 501 L420 512 L440 527 L460 545 L480 561 L500 574 L520 584 L540 572 L560 557 L580 544 L600 532 L620 531 L640 547 L660 557 L680 566 L700 576 L720 589 L740 604 L760 613 L780 598 L800 580 L820 561 L840 543 L860 528 L880 516 L900 505 L920 515 L940 534 L960 549 L980 563 L1000 579 L1020 597 L1040 615 L1060 601 L1080 581 L1100 558 L1120 535 L1140 515 L1160 499 L1180 486 L1200 508 L1220 527 L1240 543 L1260 559 L1280 576 L1300 596 L1320 617 L1340 636 L1360 650 L1380 658 L1400 655 L1420 637 L1440 620 L1460 604 L1480 588 L1500 568 L1520 545 L1540 519 L1560 495 L1580 512 L1600 537 L1620 562 L1640 586 L1640 1040Z" fill="url(#g1)"/></g></g><g class="paper"><g filter="url(#pp)"><path d="M722 673L735 698L730 697L743 724L701 724L714 697L709 698Z" fill="#7dbde8"/><path d="M1496 648L1508 671L1503 670L1516 696L1476 696L1488 670L1483 671Z" fill="#7dbde8"/><path d="M813 669L826 694L821 693L835 721L791 721L805 693L799 694Z" fill="#7dbde8"/><path d="M283 729L296 753L290 752L304 779L262 779L275 752L270 753Z" fill="#7dbde8"/><path d="M1013 688L1028 716L1022 715L1037 746L989 746L1004 715L998 716Z" fill="#7dbde8"/><path d="M134 725L146 746L141 745L152 768L116 768L128 745L123 746Z" fill="#7dbde8"/><path d="M129 710L144 738L138 736L153 768L104 768L120 736L114 738Z" fill="#7dbde8"/><path d="M1117 717L1126 734L1123 733L1132 752L1102 752L1112 733L1108 734Z" fill="#7dbde8"/><path d="M1591 630L1607 660L1600 659L1617 693L1564 693L1581 659L1574 660Z" fill="#7dbde8"/><path d="M1052 697L1066 723L1060 722L1074 750L1030 750L1044 722L1039 723Z" fill="#7dbde8"/><path d="M238 741L247 757L243 757L253 775L224 775L233 757L229 757Z" fill="#7dbde8"/><path d="M847 687L856 704L852 703L862 723L832 723L841 703L837 704Z" fill="#7dbde8"/><path d="M292 738L303 758L298 757L309 779L275 779L286 757L281 758Z" fill="#7dbde8"/><path d="M29 718L42 741L37 740L49 766L9 766L22 740L17 741Z" fill="#7dbde8"/><path d="M-40 1040 L-40 756 L-20 756 L0 756 L20 756 L40 756 L60 756 L80 756 L100 757 L120 757 L140 758 L160 760 L180 761 L200 762 L220 764 L240 766 L260 767 L280 769 L300 770 L320 771 L340 771 L360 772 L380 771 L400 771 L420 769 L440 767 L460 765 L480 762 L500 759 L520 755 L540 750 L560 746 L580 741 L600 737 L620 732 L640 728 L660 724 L680 720 L700 717 L720 714 L740 712 L760 711 L780 710 L800 710 L820 711 L840 712 L860 714 L880 716 L900 719 L920 722 L940 725 L960 728 L980 731 L1000 734 L1020 737 L1040 739 L1060 740 L1080 742 L1100 742 L1120 742 L1140 741 L1160 740 L1180 738 L1200 735 L1220 732 L1240 729 L1260 725 L1280 721 L1300 717 L1320 713 L1340 709 L1360 705 L1380 701 L1400 697 L1420 694 L1440 691 L1460 689 L1480 687 L1500 686 L1520 685 L1540 684 L1560 683 L1580 683 L1600 683 L1620 683 L1640 683 L1640 1040Z" fill="url(#g2)"/></g></g><g class="paper"><g filter="url(#pp)"><path d="M1497 680L1523 728L1512 726L1539 781L1454 781L1481 726L1470 728Z" fill="#539ed8"/><path d="M1444 732L1458 759L1452 757L1466 787L1421 787L1435 757L1429 759Z" fill="#539ed8"/><path d="M951 769L970 804L962 803L982 842L920 842L940 803L932 804Z" fill="#539ed8"/><path d="M849 773L864 801L858 800L873 831L825 831L841 800L834 801Z" fill="#539ed8"/><path d="M295 769L314 805L306 803L326 843L264 843L284 803L276 805Z" fill="#539ed8"/><path d="M343 773L362 809L354 807L374 848L311 848L331 807L323 809Z" fill="#539ed8"/><path d="M21 713L35 740L29 739L44 768L-2 768L12 739L6 740Z" fill="#539ed8"/><path d="M1144 767L1163 802L1155 801L1175 840L1114 840L1133 801L1125 802Z" fill="#539ed8"/><path d="M821 737L844 781L834 779L858 827L783 827L807 779L797 781Z" fill="#539ed8"/><path d="M569 775L583 801L577 800L591 828L546 828L561 800L555 801Z" fill="#539ed8"/><path d="M1264 738L1286 777L1277 775L1299 820L1230 820L1252 775L1243 777Z" fill="#539ed8"/><path d="M1059 763L1081 803L1072 802L1094 847L1024 847L1046 802L1037 803Z" fill="#539ed8"/><path d="M1572 706L1590 739L1583 738L1601 776L1543 776L1561 738L1554 739Z" fill="#539ed8"/><path d="M1226 757L1244 791L1237 789L1255 827L1197 827L1215 789L1208 791Z" fill="#539ed8"/><path d="M918 753L940 794L931 793L954 839L882 839L905 793L896 794Z" fill="#539ed8"/><path d="M496 784L510 810L504 809L519 838L473 838L487 809L481 810Z" fill="#539ed8"/><path d="M-40 1040 L-40 746 L-20 749 L0 753 L20 758 L40 763 L60 769 L80 775 L100 781 L120 788 L140 794 L160 801 L180 807 L200 813 L220 818 L240 823 L260 827 L280 831 L300 834 L320 836 L340 837 L360 838 L380 838 L400 838 L420 836 L440 835 L460 833 L480 830 L500 828 L520 825 L540 822 L560 820 L580 817 L600 815 L620 813 L640 811 L660 810 L680 810 L700 809 L720 810 L740 810 L760 811 L780 813 L800 815 L820 817 L840 819 L860 822 L880 824 L900 827 L920 829 L940 831 L960 833 L980 835 L1000 836 L1020 837 L1040 837 L1060 837 L1080 836 L1100 835 L1120 833 L1140 831 L1160 828 L1180 825 L1200 822 L1220 818 L1240 814 L1260 810 L1280 806 L1300 802 L1320 798 L1340 794 L1360 790 L1380 787 L1400 783 L1420 780 L1440 777 L1460 775 L1480 772 L1500 770 L1520 769 L1540 767 L1560 766 L1580 765 L1600 765 L1620 764 L1640 764 L1640 1040Z" fill="url(#g3)"/></g></g><g class="paper"><g filter="url(#pp)"><path d="M1098 853L1124 900L1113 898L1139 951L1058 951L1084 898L1073 900Z" fill="#3a82c0"/><path d="M993 787L1034 863L1017 859L1059 944L927 944L969 859L952 863Z" fill="#3a82c0"/><path d="M1349 825L1383 888L1369 885L1404 956L1294 956L1329 885L1314 888Z" fill="#3a82c0"/><path d="M1015 826L1046 883L1033 881L1065 945L965 945L997 881L984 883Z" fill="#3a82c0"/><path d="M846 843L872 891L861 889L887 942L805 942L831 889L820 891Z" fill="#3a82c0"/><path d="M1100 813L1136 879L1121 876L1158 951L1042 951L1079 876L1064 879Z" fill="#3a82c0"/><path d="M442 766L474 823L461 821L493 886L392 886L424 821L411 823Z" fill="#3a82c0"/><path d="M1187 832L1220 892L1206 889L1240 957L1135 957L1168 889L1155 892Z" fill="#3a82c0"/><path d="M1554 751L1597 832L1579 828L1624 919L1483 919L1528 828L1510 832Z" fill="#3a82c0"/><path d="M1355 858L1380 905L1370 903L1396 955L1314 955L1340 903L1330 905Z" fill="#3a82c0"/><path d="M-40 1040 L-40 888 L-20 887 L0 885 L20 884 L40 882 L60 880 L80 878 L100 875 L120 873 L140 871 L160 868 L180 866 L200 864 L220 863 L240 861 L260 861 L280 860 L300 860 L320 861 L340 862 L360 864 L380 866 L400 869 L420 872 L440 875 L460 879 L480 883 L500 888 L520 892 L540 896 L560 901 L580 905 L600 909 L620 912 L640 916 L660 919 L680 922 L700 924 L720 926 L740 928 L760 929 L780 930 L800 931 L820 931 L840 932 L860 932 L880 932 L900 932 L920 933 L940 933 L960 933 L980 934 L1000 935 L1020 936 L1040 937 L1060 938 L1080 939 L1100 941 L1120 942 L1140 944 L1160 945 L1180 947 L1200 948 L1220 949 L1240 950 L1260 950 L1280 950 L1300 949 L1320 948 L1340 947 L1360 945 L1380 942 L1400 940 L1420 936 L1440 933 L1460 929 L1480 925 L1500 921 L1520 916 L1540 912 L1560 908 L1580 903 L1600 900 L1620 896 L1640 893 L1640 1040Z" fill="url(#g4)"/></g></g></svg>
+  <div class="win" role="dialog" aria-label="Desktop guard">
+  <div class="titlebar"><span class="lights"><button class="light close" id="closeLight" aria-label="Close"></button><i class="light min"></i><i class="light max"></i></span>Desktop guard</div>
+  <div class="body">
+  <div class="head">
+    <img id="cat" alt="Tubby" />
+    <div>
+      <h1>Desktop guard</h1>
+      <p class="sub">Quiet blocks, focus sessions and a schedule. The cat stays.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Server</h2>
+    <p class="hint">Where this PC keeps your points. The phone and web use the same one.</p>
+    <label for="backend">Server address</label>
+    <input id="backend" type="url" placeholder="https://tubbybuddy-production.up.railway.app" />
+    <div class="row"><span>Profile</span><code id="device" style="font-size:11px;color:var(--muted)"></code></div>
+  </div>
+
+  <div class="card">
+    <h2>Guard</h2>
+    <div class="row"><span>Desktop guard enabled</span>
+      <input id="guardEnabled" type="checkbox" /></div>
+    <div class="row"><span>Always guard, not only during focus</span>
+      <input id="alwaysGuard" type="checkbox" /></div>
+    <div class="row"><span>Start with Windows</span>
+      <input id="startAtLogin" type="checkbox" /></div>
+    <div class="row"><span>Emergency pause</span>
+      <button id="pauseNow" class="secondary">Pause 10 min</button></div>
+    <div class="row"><span>Demo control</span>
+      <button id="demoOff" class="secondary">Guard off 30 min</button></div>
+    <p class="hint" style="margin:6px 0 0">The demo switch never burns points and turns itself back on after 30 minutes.</p>
+    <p class="hint" style="margin:4px 0 0">The block screen also closes with Esc or Ctrl+Alt+Shift+P. Ctrl+Alt+Shift+Q quits the app.</p>
+  </div>
+
+  <div class="card">
+    <h2>Apps to block</h2>
+    <p class="hint">These are desktop programs found in the Start Menu and in running windows. Pick the ones you want Tubby to interrupt. Browsers block the whole app; use Websites below for title-level blocking.</p>
+    <div class="app-search">
+      <input id="appSearch" type="text" placeholder="Search installed apps…" aria-label="Search installed apps" />
+      <button id="rescan" type="button" class="secondary">Rescan</button>
+    </div>
+    <p class="hint" id="appCount">Scanning installed apps…</p>
+    <div class="apps installed" id="apps"></div>
+    <label for="custom" style="display:block;margin-top:12px">Additional process names (comma separated)</label>
+    <input id="custom" type="text" placeholder="discord, steam, telegram" />
+    <label for="sites" style="display:block;margin-top:12px">Websites to block</label>
+    <div class="apps" id="sitesApps"></div>
+    <label for="sites" style="display:block;margin-top:12px">Additional site names (comma separated)</label>
+    <input id="sites" type="text" placeholder="LinkedIn, Twitch, news.example.com" />
+    <p class="hint" style="margin:6px 0 0">The guard matches these names in the active browser tab title, so it works without reading history or URLs. For exact URL rules, load the Chrome extension in <code>extension/</code>.</p>
+    <label for="allow" style="display:block;margin-top:12px">Never block these processes</label>
+    <input id="allow" type="text" placeholder="zoom, teams, obs64" />
+    <p class="hint" style="margin:6px 0 0">Allowlisted processes are ignored even if a title matches. Good for work calls and screen sharing.</p>
+  </div>
+
+  <div class="card">
+    <h2>Focus</h2>
+    <label for="focusMinutes">Default focus length</label>
+    <select id="focusMinutes">
+      <option value="15">15 minutes</option><option value="25">25 minutes</option>
+      <option value="45">45 minutes</option><option value="60">60 minutes</option>
+    </select>
+    <div class="row"><span>Schedule guard</span>
+      <input id="scheduleEnabled" type="checkbox" /></div>
+    <div class="days" id="days"></div>
+    <div class="grid">
+      <div><label for="start">Start</label><input id="start" type="time" value="09:00" /></div>
+      <div><label for="end">End</label><input id="end" type="time" value="17:00" /></div>
+    </div>
+    <p class="note">During a focus session or the scheduled hours, opening a guarded app brings up the block screen. Finished focus sessions earn points as usual.</p>
+  </div>
+
+  <div class="ok" id="status" role="status"></div>
+  </div>
+  <div class="actions">
+    <button class="cancel" id="cancel">Cancel</button>
+    <button class="save" id="save">Save guard settings</button>
+  </div>
+  </div>
+
+<script>
+  const q = new URLSearchParams(location.search);
+  const cat = q.get("cat") || "";
+  if (cat) document.getElementById("cat").src = cat;
+  const api = window.tubbySettings;
+  let state = null;
+  let installedApps = [];
+  let chosen = new Set();
+  let scanning = false;
+  let scanError = "";
+
+  const KNOWN = [
+    { proc: "Discord", label: "Discord", hint: "chat" },
+    { proc: "Steam", label: "Steam", hint: "games" },
+    { proc: "Telegram", label: "Telegram", hint: "messaging" },
+    { proc: "WhatsApp", label: "WhatsApp", hint: "messaging" },
+    { proc: "TikTok", label: "TikTok", hint: "short video" },
+    { proc: "Instagram", label: "Instagram", hint: "social" },
+    { proc: "Slack", label: "Slack", hint: "work chat" },
+    { proc: "Spotify", label: "Spotify", hint: "music" },
+    { proc: "chrome", label: "Google Chrome", hint: "whole browser" },
+    { proc: "msedge", label: "Microsoft Edge", hint: "whole browser" },
+    { proc: "firefox", label: "Firefox", hint: "whole browser" },
+    { proc: "Netflix", label: "Netflix", hint: "video" },
+  ];
+  const SITES = [
+    { site: "Instagram", label: "Instagram" },
+    { site: "TikTok", label: "TikTok" },
+    { site: "YouTube", label: "YouTube" },
+    { site: "X", label: "X / Twitter" },
+    { site: "Reddit", label: "Reddit" },
+    { site: "Facebook", label: "Facebook" },
+    { site: "Netflix", label: "Netflix" },
+    { site: "Twitch", label: "Twitch" },
+  ];
+  const DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+
+  function renderApps() {
+    const wrap = document.getElementById("apps");
+    const count = document.getElementById("appCount");
+    const query = document.getElementById("appSearch").value.trim().toLowerCase();
+    const rows = installedApps.length
+      ? installedApps.slice()
+      : KNOWN.map((k) => ({ name: k.label, exe: k.proc, source: "suggested" }));
+    for (const key of chosen) {
+      if (!rows.some((r) => r.exe.toLowerCase() === key || r.name.toLowerCase() === key)) {
+        rows.push({ name: key, exe: key, source: "saved" });
+      }
+    }
+    const filtered = rows.filter((r) => !query || r.name.toLowerCase().includes(query) || r.exe.toLowerCase().includes(query));
+    wrap.innerHTML = "";
+    if (!filtered.length) {
+      const empty = document.createElement("p");
+      empty.className = "hint";
+      empty.style.gridColumn = "1 / -1";
+      empty.textContent = query ? "No installed app matches that search." : "No installed apps found. Add a process name below.";
+      wrap.appendChild(empty);
+    }
+    filtered.forEach((row) => {
+      const exeKey = row.exe.toLowerCase();
+      const nameKey = row.name.toLowerCase();
+      const el = document.createElement("label");
+      el.className = "app";
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.dataset.proc = row.exe;
+      cb.checked = chosen.has(exeKey) || chosen.has(nameKey);
+      cb.addEventListener("change", () => {
+        if (cb.checked) {
+          chosen.add(exeKey);
+        } else {
+          chosen.delete(exeKey);
+          chosen.delete(nameKey);
+        }
+        renderApps();
+      });
+      const span = document.createElement("span");
+      span.textContent = row.name;
+      const small = document.createElement("small");
+      small.textContent = row.source === "saved" ? "saved process" : row.exe;
+      span.appendChild(small);
+      el.appendChild(cb);
+      el.appendChild(span);
+      wrap.appendChild(el);
+    });
+    if (scanning) count.textContent = "Scanning installed apps…";
+    else if (scanError) count.textContent = `Could not scan: ${scanError} · showing saved/suggested apps`;
+    else count.textContent = `${installedApps.length} installed apps · ${chosen.size} blocked`;
+  }
+
+  async function loadInstalled(force = false) {
+    if (scanning) return;
+    scanning = true;
+    scanError = "";
+    renderApps();
+    try {
+      const r = await api.apps?.(force);
+      installedApps = Array.isArray(r?.apps) ? r.apps : [];
+      scanError = r?.error || "";
+    } catch (e) {
+      installedApps = [];
+      scanError = e?.message || "scan failed";
+    } finally {
+      scanning = false;
+      renderApps();
+    }
+  }
+
+  function render(cfg) {
+    state = cfg;
+    chosen = new Set((cfg.blockedApps || []).map((s) => String(s).toLowerCase()));
+    document.getElementById("backend").value = cfg.backendUrl || "";
+    document.getElementById("device").textContent = cfg.deviceId || "";
+    document.getElementById("guardEnabled").checked = !!cfg.guardEnabled;
+    document.getElementById("alwaysGuard").checked = !!cfg.alwaysGuard;
+    document.getElementById("startAtLogin").checked = !!cfg.startAtLogin;
+    document.getElementById("focusMinutes").value = String(cfg.focusMinutes || 25);
+    document.getElementById("scheduleEnabled").checked = !!cfg.schedule?.enabled;
+    document.getElementById("start").value = cfg.schedule?.start || "09:00";
+    document.getElementById("end").value = cfg.schedule?.end || "17:00";
+    document.getElementById("custom").value = "";
+    const blockedSites = (cfg.blockedSites || []).map((s) => String(s).toLowerCase());
+    const customSites = (cfg.blockedSites || []).filter((s) => !SITES.some((k) => k.site.toLowerCase() === String(s).toLowerCase()));
+    document.getElementById("sites").value = customSites.join(", ");
+    document.getElementById("allow").value = (cfg.allowlist || []).join(", ");
+    renderApps();
+    loadInstalled();
+    const siteWrap = document.getElementById("sitesApps");
+    siteWrap.innerHTML = "";
+    SITES.forEach((s) => {
+      const el = document.createElement("label");
+      el.className = "app";
+      el.innerHTML = `<input type="checkbox" data-site="${s.site}" ${blockedSites.includes(s.site.toLowerCase()) ? "checked" : ""} />
+        <span>${s.label}<small>browser title</small></span>`;
+      siteWrap.appendChild(el);
+    });
+    const days = cfg.schedule?.days || [1,2,3,4,5];
+    const dw = document.getElementById("days");
+    dw.innerHTML = "";
+    DAYS.forEach((label, i) => {
+      const d = document.createElement("div");
+      d.className = "day" + (days.includes(i + 1) ? " on" : "");
+      d.textContent = label;
+      d.dataset.day = String(i + 1);
+      d.addEventListener("click", () => d.classList.toggle("on"));
+      dw.appendChild(d);
+    });
+  }
+
+  api.load().then(render).catch((e) => { document.getElementById("status").textContent = e.message || "Could not load settings"; });
+  document.getElementById("appSearch").addEventListener("input", renderApps);
+  document.getElementById("rescan").addEventListener("click", () => loadInstalled(true));
+  document.getElementById("pauseNow").addEventListener("click", () => {
+    window.tubbyDesktop?.pauseGuard?.();
+    document.getElementById("status").textContent = "Guard paused for 10 minutes.";
+  });
+  document.getElementById("demoOff").addEventListener("click", () => {
+    window.tubbyDesktop?.demoOff?.();
+    document.getElementById("status").textContent = "Demo guard off for 30 minutes. No points burned.";
+  });
+
+  document.getElementById("cancel").addEventListener("click", () => api.close());
+  document.getElementById("closeLight").addEventListener("click", () => api.close());
+  document.getElementById("save").addEventListener("click", async () => {
+    const status = document.getElementById("status");
+    status.textContent = "Saving…";
+    const extra = document.getElementById("custom").value.split(",").map((s) => s.trim()).filter(Boolean);
+    const siteSelected = [...document.querySelectorAll("#sitesApps input:checked")].map((n) => n.dataset.site);
+    const siteExtra = document.getElementById("sites").value.split(",").map((s) => s.trim()).filter(Boolean);
+    const allow = document.getElementById("allow").value.split(",").map((s) => s.trim()).filter(Boolean);
+    const days = [...document.querySelectorAll(".day.on")].map((n) => Number(n.dataset.day));
+    const next = {
+      ...state,
+      backendUrl: document.getElementById("backend").value.trim() || state.backendUrl,
+      guardEnabled: document.getElementById("guardEnabled").checked,
+      alwaysGuard: document.getElementById("alwaysGuard").checked,
+      startAtLogin: document.getElementById("startAtLogin").checked,
+      focusMinutes: Number(document.getElementById("focusMinutes").value) || 25,
+      blockedApps: [...new Set([...chosen, ...extra].map((s) => String(s).trim()).filter(Boolean))],
+      blockedSites: [...new Set([...siteSelected, ...siteExtra])],
+      allowlist: [...new Set(allow)],
+      schedule: {
+        enabled: document.getElementById("scheduleEnabled").checked,
+        days: days.length ? days : [1,2,3,4,5],
+        start: document.getElementById("start").value || "09:00",
+        end: document.getElementById("end").value || "17:00",
+      },
+    };
+    try {
+      state = await api.save(next);
+      status.textContent = "Saved. The guard will use this immediately.";
+      setTimeout(() => api.close(), 900);
+    } catch (e) {
+      status.textContent = e.message || "Could not save";
+    }
+  });
+</script>
+</body>
+</html>

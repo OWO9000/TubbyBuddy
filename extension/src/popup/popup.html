@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TubbyBuddy: Focus Guard</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="head">
+      <div class="brand-mark" aria-hidden="true">
+        <img class="brand-icon" src="../../icons/icon128.png" width="46" height="46" alt="" />
+      </div>
+      <div class="title-block">
+        <h1>TubbyBuddy</h1>
+        <p class="tagline">Put your distractions down. Earn real life.</p>
+      </div>
+      <div class="status"><span id="backend-dot" class="dot dot-unknown" aria-hidden="true"></span><span id="backend-text">Checking…</span></div>
+    </header>
+
+    <section class="stats" aria-label="Points and streaks">
+      <div class="stat"><div class="label">Balance</div><div id="balance" class="value">—</div></div>
+      <div class="stat"><div class="label">Streak</div><div id="streak" class="value">—</div></div>
+      <div class="stat"><div class="label">Best</div><div id="best" class="value">—</div></div>
+    </section>
+
+    <p id="pending" class="pending" hidden></p>
+
+    <section class="recent-block" aria-label="Recent activity">
+      <h2>Recent</h2>
+      <ul id="recent" class="recent"></ul>
+      <p id="recent-empty" class="muted">No activity yet.</p>
+    </section>
+
+    <footer class="foot">
+      <button id="open-options" type="button" class="btn">Open options</button>
+    </footer>
+  </div>
+  <script src="../shared/constants.js"></script>
+  <script src="../shared/storage.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
