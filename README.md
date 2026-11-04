@@ -7,7 +7,7 @@ TubbyBuddy is a focus app with a cat in charge. You pick the apps and sites that
 your points burn and your streak resets. Points come from finishing focus sessions and checking in, and you spend them
 on real things nearby: a latte, a climbing day pass, a pottery class.
 
-Every AI feature runs on Meta's Muse models.
+Every AI feature runs on Meta's Muse models. Built for the Meta Global AI Developer Hackathon.
 
 **Live:** https://tubbybuddy-production.up.railway.app (sign in with Google, or look around with the demo account).
 The Android and Windows apps are on the [releases page](https://github.com/OWO9000/TubbyBuddy/releases/latest).
@@ -107,3 +107,7 @@ node tools/e2e/extension.mjs               # 11 extension checks
 - The offers are fictional demo businesses. Codes and QRs work inside the app; merchants aren't verified.
 - The desktop guard is Windows-only and matches browser tabs by title; exact URLs need the extension.
 - Tubby is a focus companion, not a therapist. It gives no medical or mental-health advice.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
