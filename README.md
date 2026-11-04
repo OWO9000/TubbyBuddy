@@ -9,6 +9,8 @@ on real things nearby: a latte, a climbing day pass, a pottery class.
 
 Every AI feature runs on Meta's Muse models. Built for the Meta Global AI Developer Hackathon.
 
+**Demo video (2:22):** https://youtu.be/J8uJXpG4LBk
+
 **Live:** https://tubbybuddy-production.up.railway.app (sign in with Google, or look around with the demo account).
 The Android and Windows apps are on the [releases page](https://github.com/OWO9000/TubbyBuddy/releases/latest).
 
